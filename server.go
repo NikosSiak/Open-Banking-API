@@ -37,8 +37,10 @@ func bootstrap(
 
       return nil
     },
-    OnStop: func(context.Context) error {
+    OnStop: func(ctx context.Context) error {
       fmt.Println("Stopping Server")
+
+      db.Close(ctx)
 
       return nil
     },
