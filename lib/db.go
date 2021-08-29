@@ -5,6 +5,7 @@ import (
   "time"
 
   "github.com/NikosSiak/Open-Banking-API/models"
+  "go.mongodb.org/mongo-driver/bson"
   "go.mongodb.org/mongo-driver/mongo"
   "go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -37,4 +38,21 @@ func (d Database) Close(ctx context.Context) {
 
 func (d Database) InsertOne(ctx context.Context, document models.Model) (*mongo.InsertOneResult, error) {
   return d.database.Collection(document.CollectionName()).InsertOne(ctx, document)
+}
+
+func (d Database) FindOne(ctx context.Context, res models.Model, query bson.M, projection bson.M) error {
+  return d.database.Collection((res).CollectionName()).FindOne(ctx, query, options.FindOne().SetProjection(projection)).Decode(res)
+}
+
+func (d Database) Find(ctx context.Context, res []models.Model, query bson.M, projection bson.M) error {
+  filterCursor, err := d.database.Collection((res)[0].CollectionName()).Find(ctx, query)
+  if err != nil {
+    return err
+  }
+
+  if err = filterCursor.All(ctx, res); err != nil {
+    return err
+  }
+
+  return nil
 }
