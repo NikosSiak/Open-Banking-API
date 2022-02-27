@@ -12,12 +12,20 @@ type ProviderCredentials struct {
   SubscriptionKey string `mapstructure:"subscription_key"`
 }
 
+type RedisCredentials struct {
+  Address string `mapstructure:"address"`
+  Password string `mapstructure:"password"`
+  Database int `mapstructure:"database"`
+}
+
 type Env struct {
   ServerPort string `mapstructure:"server_port"`
-  Providers map[string]*ProviderCredentials `mapstructure:"providers"`
   DatabaseURI string `mapstructure:"db_uri"`
   DatabaseName string `mapstructure:"db_name"`
+  RedisCredentials *RedisCredentials `mapstructure:"redis"`
+  JWTSecret string `mapstructure:"jwt_secret"`
   Environment string `mapstructure:"environment"`
+  Providers map[string]*ProviderCredentials `mapstructure:"providers"`
 }
 
 func GetEnv() Env {

@@ -7,6 +7,7 @@ import (
   "github.com/NikosSiak/Open-Banking-API/api/controllers/v1"
   "github.com/NikosSiak/Open-Banking-API/api/routes/v1"
   "github.com/NikosSiak/Open-Banking-API/lib"
+  "github.com/NikosSiak/Open-Banking-API/services"
   "go.uber.org/fx"
 )
 
@@ -15,6 +16,7 @@ func main() {
     lib.Module,
     routes.Module,
     controllers.Module,
+    services.Module,
     fx.Invoke(bootstrap),
   ).Run()
 }
