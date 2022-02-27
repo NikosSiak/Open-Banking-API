@@ -3,6 +3,7 @@ package controllers
 import (
   "context"
   "net/http"
+  "strings"
   "time"
 
   "github.com/gin-gonic/gin"
@@ -146,6 +147,30 @@ func (u UserController) AuthenticateUser(ctx *gin.Context) {
 }
 
 func (u UserController) LogoutUser(ctx *gin.Context) {
+  authHeader := ctx.Request.Header.Get("Authorization")
+  t := strings.Split(authHeader, " ")
+
+  if len(t) != 2 {
+    ctx.JSON(http.StatusBadRequest, gin.H{
+      "error": "missing bearer token",
+    })
+
+    ctx.Abort()
+    return
+  }
+
+  accessUuid, _ := u.authService.GetAccessUuid(t[1])
+  if err := u.deleteToken(ctx.Request.Context(), accessUuid); err != nil {
+    ctx.JSON(http.StatusInternalServerError, gin.H{
+      "error": err,
+    })
+
+    return
+  }
+
+  ctx.JSON(http.StatusOK, gin.H{
+    "message": "success",
+  })
 }
 
 func (u UserController) storeTokenDetails(c context.Context, userId string, td *services.TokenDetails) error {
@@ -158,6 +183,15 @@ func (u UserController) storeTokenDetails(c context.Context, userId string, td *
   }
 
   if err := u.redis.SetEX(c, td.RefreshUuid, userId, rt.Sub(now)).Err(); err != nil {
+    return err
+  }
+
+  return nil
+}
+
+func (u UserController) deleteToken(c context.Context, tokenUuid string) error {
+  _, err := u.redis.Del(c, tokenUuid).Result()
+  if err != nil {
     return err
   }
 

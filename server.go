@@ -5,6 +5,7 @@ import (
   "fmt"
 
   "github.com/NikosSiak/Open-Banking-API/api/controllers/v1"
+  "github.com/NikosSiak/Open-Banking-API/api/middlewares/v1"
   "github.com/NikosSiak/Open-Banking-API/api/routes/v1"
   "github.com/NikosSiak/Open-Banking-API/lib"
   "github.com/NikosSiak/Open-Banking-API/services"
@@ -15,6 +16,7 @@ func main() {
   fx.New(
     lib.Module,
     routes.Module,
+    middlewares.Module,
     controllers.Module,
     services.Module,
     fx.Invoke(bootstrap),

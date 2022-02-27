@@ -61,3 +61,37 @@ func (a AuthService) CreateTokens() (*TokenDetails, error) {
 
   return td, nil
 }
+
+func (a AuthService) VerifyToken(tokenString string) (*jwt.Token, error) {
+  token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+    return a.jwtSecret, nil
+  })
+  if err != nil {
+    return nil, err
+  }
+
+  if !token.Valid {
+    return nil, errors.New("invalid token")
+  }
+
+  return token, nil
+}
+
+func (a AuthService) GetAccessUuid(tokenString string) (string, error) {
+  token, err := a.VerifyToken(tokenString)
+  if err != nil {
+    return "", err
+  }
+
+  claims, ok := token.Claims.(jwt.MapClaims)
+  if !ok {
+    return "", errors.New("invlaid token")
+  }
+
+  accessUuid, ok := claims["access_uuid"].(string)
+  if !ok {
+    return "", errors.New("no access uuid")
+  }
+
+  return accessUuid, nil
+}
