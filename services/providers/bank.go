@@ -1,5 +1,5 @@
 package providers
 
 type Bank interface {
-  GetBalance() int64
+  Name() string
 }

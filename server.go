@@ -9,6 +9,7 @@ import (
   "github.com/NikosSiak/Open-Banking-API/api/routes/v1"
   "github.com/NikosSiak/Open-Banking-API/lib"
   "github.com/NikosSiak/Open-Banking-API/services"
+  "github.com/NikosSiak/Open-Banking-API/services/providers"
   "go.uber.org/fx"
 )
 
@@ -19,6 +20,7 @@ func main() {
     middlewares.Module,
     controllers.Module,
     services.Module,
+    providers.Module,
     fx.Invoke(bootstrap),
   ).Run()
 }
