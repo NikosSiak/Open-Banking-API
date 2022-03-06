@@ -28,6 +28,14 @@ func NewUserController(db lib.Database, redis lib.Redis, authService services.Au
 	}
 }
 
+// Register User
+// @Summary  Register a new User
+// @Tags     User
+// @Router   /register [post]
+// @Param    email     body      string  true  "User email"
+// @Param    password  body      string  true  "User password"
+// @Success  200       {object}  responses.TokenResponse
+// @Failure  500       {object}  utils.HTTPError
 func (u UserController) CreateUser(ctx *gin.Context) {
 	user := models.User{}
 
@@ -82,13 +90,16 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 	})
 }
 
+// Login
+// @Summary  Get access and refresh tokens for user
+// @Tags     User
+// @Router   /login [post]
+// @Param    data  body      models.UserLoginCredentials  true  "User credentials"
+// @Success  200   {object}  responses.TokenResponse
+// @Failure  401   {object}  utils.HTTPError
+// @Failure  500   {object}  utils.HTTPError
 func (u UserController) AuthenticateUser(ctx *gin.Context) {
-	type UserLoginCredentials struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	userCreds := UserLoginCredentials{}
+	userCreds := models.UserLoginCredentials{}
 
 	if err := ctx.ShouldBindJSON(&userCreds); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -146,6 +157,14 @@ func (u UserController) AuthenticateUser(ctx *gin.Context) {
 	})
 }
 
+// Logout
+// @Summary   Invalidate User tokens
+// @Tags      User
+// @Router    /logout [post]
+// @Security  BearerAuth
+// @Success   200  {object}  responses.SuccessResponse
+// @Failure   401  {object}  responses.UnauthorizedError
+// @Failure   500  {object}  utils.HTTPError
 func (u UserController) LogoutUser(ctx *gin.Context) {
 	authHeader := ctx.Request.Header.Get("Authorization")
 	t := strings.Split(authHeader, " ")

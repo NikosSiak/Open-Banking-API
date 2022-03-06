@@ -23,6 +23,11 @@ type User struct {
 	UpdatedAt   primitive.DateTime  `bson:"updated_at"`
 }
 
+type UserLoginCredentials struct {
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
 func (u User) CollectionName() string {
 	return "users"
 }

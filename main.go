@@ -13,6 +13,12 @@ import (
 	"go.uber.org/fx"
 )
 
+// @title    Open Banking Demo
+// @version  1.0
+
+// @securityDefinitions.apikey  BearerAuth
+// @in                          header
+// @name                        Authorization
 func main() {
 	fx.New(
 		lib.Module,

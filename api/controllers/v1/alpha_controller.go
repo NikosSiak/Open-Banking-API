@@ -23,6 +23,15 @@ func NewAlphaController(provider providers.Alpha, db lib.Database) AlphaControll
 	}
 }
 
+// Add AlphaBank Account
+// @Summary      Authorize the use of the user's AlphaBank account
+// @Description  Use the URI to open AlphaBank's login page
+// @Tags         Accounts
+// @Router       /v1/accounts/alpha [post]
+// @Security     BearerAuth
+// @Success      200  {object}  responses.AddAlphaBankAccountResponse
+// @Failure      401  {object}  responses.UnauthorizedError
+// @Failure      500  {object}  utils.HTTPError
 func (a AlphaController) AddAccount(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
 
