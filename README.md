@@ -7,7 +7,7 @@ Gather all your greek banking accounts into one app
 Run the following command to run the server
 
 ```bash
-go run server.go
+go run main.go
 ```
 
 Config schema
