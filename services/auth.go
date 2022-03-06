@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/NikosSiak/Open-Banking-API/lib"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 )
 
