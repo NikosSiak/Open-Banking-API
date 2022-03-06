@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/NikosSiak/Open-Banking-API/api/utils"
 	"github.com/NikosSiak/Open-Banking-API/lib"
 	"github.com/NikosSiak/Open-Banking-API/models"
 	"github.com/NikosSiak/Open-Banking-API/services/providers"
@@ -37,9 +38,7 @@ func (a AlphaController) AddAccount(ctx *gin.Context) {
 
 	loginUri, err := a.provider.LoginUri(user.(models.User).ID.Hex())
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 

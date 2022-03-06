@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/NikosSiak/Open-Banking-API/api/utils"
 	"github.com/NikosSiak/Open-Banking-API/lib"
 	"github.com/NikosSiak/Open-Banking-API/models"
 	"github.com/NikosSiak/Open-Banking-API/services"
@@ -40,18 +42,12 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 	user := models.User{}
 
 	if err := ctx.ShouldBindJSON(&user); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
 	if err := user.HashPassword(); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -59,28 +55,19 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 
 	inserted, err := u.db.InsertOne(ctx.Request.Context(), &user)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
 	td, err := u.authService.CreateTokens()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
 	userId := inserted.InsertedID.(primitive.ObjectID).Hex()
 	if err = u.storeTokenDetails(ctx.Request.Context(), userId, td); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -102,10 +89,7 @@ func (u UserController) AuthenticateUser(ctx *gin.Context) {
 	userCreds := models.UserLoginCredentials{}
 
 	if err := ctx.ShouldBindJSON(&userCreds); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -118,36 +102,24 @@ func (u UserController) AuthenticateUser(ctx *gin.Context) {
 		bson.M{},
 	)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
 	if !user.CheckPasswordHash(userCreds.Password) {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error": "wrong email or password",
-		})
-
+		utils.NewError(ctx, http.StatusUnauthorized, errors.New("wrong email or password"))
 		return
 	}
 
 	td, err := u.authService.CreateTokens()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
 	userId := user.ID.Hex()
 	if err = u.storeTokenDetails(ctx.Request.Context(), userId, td); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -170,20 +142,14 @@ func (u UserController) LogoutUser(ctx *gin.Context) {
 	t := strings.Split(authHeader, " ")
 
 	if len(t) != 2 {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "missing bearer token",
-		})
-
+		utils.NewError(ctx, http.StatusBadRequest, errors.New("missing bearer token"))
 		ctx.Abort()
 		return
 	}
 
 	accessUuid, _ := u.authService.GetAccessUuid(t[1])
 	if err := u.deleteToken(ctx.Request.Context(), accessUuid); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err,
-		})
-
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 

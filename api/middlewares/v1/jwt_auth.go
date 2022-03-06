@@ -2,9 +2,11 @@ package middlewares
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 
+	"github.com/NikosSiak/Open-Banking-API/api/utils"
 	"github.com/NikosSiak/Open-Banking-API/lib"
 	"github.com/NikosSiak/Open-Banking-API/models"
 	"github.com/NikosSiak/Open-Banking-API/services"
@@ -32,30 +34,21 @@ func (j JwtAuthMiddleware) Handle(ctx *gin.Context) {
 	t := strings.Split(authHeader, " ")
 
 	if len(t) != 2 {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "missing bearer token",
-		})
-
+		utils.NewError(ctx, http.StatusBadRequest, errors.New("missing bearer token"))
 		ctx.Abort()
 		return
 	}
 
 	accessUuid, err := j.authService.GetAccessUuid(t[1])
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusUnauthorized, err)
 		ctx.Abort()
 		return
 	}
 
 	user, err := j.getUser(ctx.Request.Context(), accessUuid)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error": err.Error(),
-		})
-
+		utils.NewError(ctx, http.StatusUnauthorized, err)
 		ctx.Abort()
 		return
 	}
