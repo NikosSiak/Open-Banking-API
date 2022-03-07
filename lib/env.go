@@ -20,15 +20,22 @@ type RedisCredentials struct {
 	Database int    `mapstructure:"database"`
 }
 
+type TwilioCredentials struct {
+	AccountSID string `mapstructure:"account_sid"`
+	AuthToken  string `mapstructure:"auth_token"`
+	VerifySID  string `mapstructure:"verify_sid"`
+}
+
 type Env struct {
-	AppUrl           string                          `mapstructure:"app_url"`
-	ServerPort       string                          `mapstructure:"server_port"`
-	DatabaseURI      string                          `mapstructure:"db_uri"`
-	DatabaseName     string                          `mapstructure:"db_name"`
-	RedisCredentials *RedisCredentials               `mapstructure:"redis"`
-	JWTSecret        string                          `mapstructure:"jwt_secret"`
-	Environment      string                          `mapstructure:"environment"`
-	Providers        map[string]*ProviderCredentials `mapstructure:"providers"`
+	AppUrl            string                          `mapstructure:"app_url"`
+	ServerPort        string                          `mapstructure:"server_port"`
+	DatabaseURI       string                          `mapstructure:"db_uri"`
+	DatabaseName      string                          `mapstructure:"db_name"`
+	RedisCredentials  *RedisCredentials               `mapstructure:"redis"`
+	JWTSecret         string                          `mapstructure:"jwt_secret"`
+	Environment       string                          `mapstructure:"environment"`
+	Providers         map[string]*ProviderCredentials `mapstructure:"providers"`
+	TwilioCredentials *TwilioCredentials              `mapstructure:"twilio"`
 }
 
 func GetEnv() Env {

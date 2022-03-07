@@ -7,4 +7,5 @@ var Module = fx.Options(
 	fx.Provide(NewDB),
 	fx.Provide(NewRedis),
 	fx.Provide(NewRequestHandler),
+	fx.Provide(NewSMSProvider),
 )
