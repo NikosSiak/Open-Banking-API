@@ -141,12 +141,6 @@ func (u UserController) LogoutUser(ctx *gin.Context) {
 	authHeader := ctx.Request.Header.Get("Authorization")
 	t := strings.Split(authHeader, " ")
 
-	if len(t) != 2 {
-		utils.NewError(ctx, http.StatusBadRequest, errors.New("missing bearer token"))
-		ctx.Abort()
-		return
-	}
-
 	accessUuid, _ := u.authService.GetAccessUuid(t[1])
 	if err := u.deleteToken(ctx.Request.Context(), accessUuid); err != nil {
 		utils.NewError(ctx, http.StatusInternalServerError, err)

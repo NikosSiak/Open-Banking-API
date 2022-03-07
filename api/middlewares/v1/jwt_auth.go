@@ -34,21 +34,21 @@ func (j JwtAuthMiddleware) Handle(ctx *gin.Context) {
 	t := strings.Split(authHeader, " ")
 
 	if len(t) != 2 {
-		utils.NewError(ctx, http.StatusBadRequest, errors.New("missing bearer token"))
+		utils.NewError(ctx, http.StatusBadRequest, errors.New("Missing or Invalid token"))
 		ctx.Abort()
 		return
 	}
 
 	accessUuid, err := j.authService.GetAccessUuid(t[1])
 	if err != nil {
-		utils.NewError(ctx, http.StatusUnauthorized, err)
+		utils.NewError(ctx, http.StatusUnauthorized, errors.New("Missing or Invalid token"))
 		ctx.Abort()
 		return
 	}
 
 	user, err := j.getUser(ctx.Request.Context(), accessUuid)
 	if err != nil {
-		utils.NewError(ctx, http.StatusUnauthorized, err)
+		utils.NewError(ctx, http.StatusUnauthorized, errors.New("Missing or Invalid token"))
 		ctx.Abort()
 		return
 	}
