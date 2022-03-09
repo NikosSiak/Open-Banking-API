@@ -27,5 +27,6 @@ func NewUserAuthRoutes(
 func (u UserAuthRoutes) Setup() {
 	u.handler.Gin.POST("/register", u.controller.CreateUser)
 	u.handler.Gin.POST("/login", u.controller.AuthenticateUser)
+	u.handler.Gin.POST("/verify", u.controller.ValidateCode)
 	u.handler.Gin.POST("/logout", u.jwtAuthMiddleware.Handle, u.controller.LogoutUser)
 }

@@ -1,4 +1,17 @@
 definitions:
+  models.User:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    required:
+    - email
+    - password
+    - phone_number
+    type: object
   models.UserLoginCredentials:
     properties:
       email:
@@ -13,6 +26,15 @@ definitions:
     properties:
       uri:
         example: https://gw.api.alphabank.eu/sandbox/auth/authorize
+        type: string
+    type: object
+  responses.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      sid:
         type: string
     type: object
   responses.SuccessResponse:
@@ -47,6 +69,8 @@ info:
 paths:
   /login:
     post:
+      description: If the user has enabled TwoFa the result will have a verification
+        ID for the verify route, else the access and refresh tokens are returned
       parameters:
       - description: User credentials
         in: body
@@ -58,7 +82,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.TokenResponse'
+            $ref: '#/definitions/responses.LoginResponse'
         "401":
           description: Unauthorized
           schema:
@@ -93,18 +117,12 @@ paths:
   /register:
     post:
       parameters:
-      - description: User email
+      - description: User info
         in: body
-        name: email
+        name: data
         required: true
         schema:
-          type: string
-      - description: User password
-        in: body
-        name: password
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/models.User'
       responses:
         "200":
           description: OK
@@ -138,6 +156,35 @@ paths:
       summary: Authorize the use of the user's AlphaBank account
       tags:
       - Accounts
+  /verify:
+    post:
+      parameters:
+      - description: Verification ID provided by login
+        in: query
+        name: sid
+        required: true
+        type: string
+      - description: TwoFactor authentication code
+        in: query
+        name: code
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.TokenResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Verify a user login with a twofa code
+      tags:
+      - User
 securityDefinitions:
   BearerAuth:
     in: header

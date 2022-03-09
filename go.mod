@@ -17,12 +17,12 @@ require (
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.8.0
+	github.com/twilio/twilio-go v0.22.1
 	github.com/ugorji/go v1.2.7 // indirect
 	go.mongodb.org/mongo-driver v1.7.1
 	go.uber.org/fx v1.14.2
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
-	golang.org/x/tools v0.1.9 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 )

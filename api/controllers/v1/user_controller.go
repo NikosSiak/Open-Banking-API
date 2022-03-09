@@ -20,13 +20,20 @@ type UserController struct {
 	db          lib.Database
 	redis       lib.Redis
 	authService services.AuthService
+	sms         lib.SMSProvider
 }
 
-func NewUserController(db lib.Database, redis lib.Redis, authService services.AuthService) UserController {
+func NewUserController(
+	db lib.Database,
+	redis lib.Redis,
+	authService services.AuthService,
+	sms lib.SMSProvider,
+) UserController {
 	return UserController{
 		db:          db,
 		redis:       redis,
 		authService: authService,
+		sms:         sms,
 	}
 }
 
@@ -34,10 +41,9 @@ func NewUserController(db lib.Database, redis lib.Redis, authService services.Au
 // @Summary  Register a new User
 // @Tags     User
 // @Router   /register [post]
-// @Param    email     body      string  true  "User email"
-// @Param    password  body      string  true  "User password"
-// @Success  200       {object}  responses.TokenResponse
-// @Failure  500       {object}  utils.HTTPError
+// @Param    data  body      models.User  true  "User info"
+// @Success  200   {object}  responses.TokenResponse
+// @Failure  500   {object}  utils.HTTPError
 func (u UserController) CreateUser(ctx *gin.Context) {
 	user := models.User{}
 
@@ -45,6 +51,8 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
+
+	user.HasTwoFa = true
 
 	if err := user.HashPassword(); err != nil {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
@@ -78,13 +86,14 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 }
 
 // Login
-// @Summary  Get access and refresh tokens for user
-// @Tags     User
-// @Router   /login [post]
-// @Param    data  body      models.UserLoginCredentials  true  "User credentials"
-// @Success  200   {object}  responses.TokenResponse
-// @Failure  401   {object}  utils.HTTPError
-// @Failure  500   {object}  utils.HTTPError
+// @Summary      Get access and refresh tokens for user
+// @Tags         User
+// @Description  If the user has enabled TwoFa the result will have a verification ID for the verify route, else the access and refresh tokens are returned
+// @Router       /login [post]
+// @Param        data  body      models.UserLoginCredentials  true  "User credentials"
+// @Success      200   {object}  responses.LoginResponse
+// @Failure      401   {object}  utils.HTTPError
+// @Failure      500   {object}  utils.HTTPError
 func (u UserController) AuthenticateUser(ctx *gin.Context) {
 	userCreds := models.UserLoginCredentials{}
 
@@ -111,6 +120,25 @@ func (u UserController) AuthenticateUser(ctx *gin.Context) {
 		return
 	}
 
+	if user.HasTwoFa {
+		sid, err := u.sms.SendVerificationCode(user.PhoneNumber)
+		if err != nil {
+			utils.NewError(ctx, http.StatusInternalServerError, err)
+			return
+		}
+
+		if err = u.redis.Set(ctx.Request.Context(), sid, user.ID.Hex(), 0).Err(); err != nil {
+			utils.NewError(ctx, http.StatusInternalServerError, err)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"sid": sid,
+		})
+
+		return
+	}
+
 	td, err := u.authService.CreateTokens()
 	if err != nil {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
@@ -122,6 +150,55 @@ func (u UserController) AuthenticateUser(ctx *gin.Context) {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"access_token":  td.AccessToken,
+		"refresh_token": td.RefreshToken,
+	})
+}
+
+// Two Factor Authentication
+// @Summary  Verify a user login with a twofa code
+// @Tags     User
+// @Router   /verify [post]
+// @Param    sid   query     string  true  "Verification ID provided by login"
+// @Param    code  query     string  true  "TwoFactor authentication code"
+// @Success  200   {object}  responses.TokenResponse
+// @Failure  401   {object}  utils.HTTPError
+// @Failure  500   {object}  utils.HTTPError
+func (u UserController) ValidateCode(ctx *gin.Context) {
+	sid := ctx.Query("sid")
+	code := ctx.Query("code")
+
+	valid, err := u.sms.VerifyCode(sid, code)
+	if err != nil {
+		utils.NewError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	if !valid {
+		utils.NewError(ctx, http.StatusUnauthorized, errors.New("Invalid code"))
+		return
+	}
+
+	td, err := u.authService.CreateTokens()
+	if err != nil {
+		utils.NewError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	userId, err := u.redis.Get(ctx.Request.Context(), sid).Result()
+	if err != nil {
+		utils.NewError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err = u.storeTokenDetails(ctx.Request.Context(), userId, td); err != nil {
+		utils.NewError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	u.redis.Del(ctx.Request.Context(), sid)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"access_token":  td.AccessToken,

@@ -13,14 +13,14 @@ type Account struct {
 }
 
 type User struct {
-	ID          primitive.ObjectID  `bson:"_id,omitempty" json:"_id,omitempty"`
-	Email       string              `bson:"email,omitempty" json:"email,omitempty"`
-	Password    string              `bson:"hashed_password,omitempty" json:"password,omitempty"`
-	PhoneNumber string              `bson:"phone_number,omitempty" json:"phone_number,omitempty"`
-	HasTwoFa    bool                `bson:"has_two_fa,omitempty" json:"has_two_fa,omitempty"`
-	Accounts    map[string]*Account `bson:"accounts,omitempty" json:"accounts,omitempty"`
-	CreatedAt   primitive.DateTime  `bson:"created_at"`
-	UpdatedAt   primitive.DateTime  `bson:"updated_at"`
+	ID          primitive.ObjectID  `bson:"_id,omitempty" json:"-"`
+	Email       string              `bson:"email,omitempty" json:"email,omitempty" binding:"required"`
+	Password    string              `bson:"hashed_password,omitempty" json:"password,omitempty" binding:"required"`
+	PhoneNumber string              `bson:"phone_number,omitempty" json:"phone_number,omitempty" binding:"required"`
+	HasTwoFa    bool                `bson:"has_two_fa,omitempty" json:"-"`
+	Accounts    map[string]*Account `bson:"accounts,omitempty" json:"-"`
+	CreatedAt   primitive.DateTime  `bson:"created_at" json:"-"`
+	UpdatedAt   primitive.DateTime  `bson:"updated_at" json:"-"`
 }
 
 type UserLoginCredentials struct {
