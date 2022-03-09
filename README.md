@@ -30,6 +30,11 @@ Config schema
       "client_secret": "client_secret",
       "subscription_key": "GR - Accounts subscription key"
     }
+  },
+  "twilio": {
+    "account_sid": "account_sid",
+    "auth_token": "auth_token",
+    "verify_sid": "verify_sid"
   }
 }
 ```
