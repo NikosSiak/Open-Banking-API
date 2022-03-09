@@ -18,6 +18,7 @@ const docTemplate = `{
     "paths": {
         "/login": {
             "post": {
+                "description": "If the user has enabled TwoFa the result will have a verification ID for the verify route, else the access and refresh tokens are returned",
                 "tags": [
                     "User"
                 ],
@@ -37,7 +38,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.TokenResponse"
+                            "$ref": "#/definitions/responses.LoginResponse"
                         }
                     },
                     "401": {
@@ -163,6 +164,50 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/verify": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Verify a user login with a twofa code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Verification ID provided by login",
+                        "name": "sid",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "TwoFactor authentication code",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.TokenResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -187,6 +232,20 @@ const docTemplate = `{
                 "uri": {
                     "type": "string",
                     "example": "https://gw.api.alphabank.eu/sandbox/auth/authorize"
+                }
+            }
+        },
+        "responses.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "sid": {
+                    "type": "string"
                 }
             }
         },

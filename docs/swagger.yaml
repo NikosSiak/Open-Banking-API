@@ -15,6 +15,15 @@ definitions:
         example: https://gw.api.alphabank.eu/sandbox/auth/authorize
         type: string
     type: object
+  responses.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      sid:
+        type: string
+    type: object
   responses.SuccessResponse:
     properties:
       message:
@@ -47,6 +56,8 @@ info:
 paths:
   /login:
     post:
+      description: If the user has enabled TwoFa the result will have a verification
+        ID for the verify route, else the access and refresh tokens are returned
       parameters:
       - description: User credentials
         in: body
@@ -58,7 +69,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.TokenResponse'
+            $ref: '#/definitions/responses.LoginResponse'
         "401":
           description: Unauthorized
           schema:
@@ -138,6 +149,35 @@ paths:
       summary: Authorize the use of the user's AlphaBank account
       tags:
       - Accounts
+  /verify:
+    post:
+      parameters:
+      - description: Verification ID provided by login
+        in: query
+        name: sid
+        required: true
+        type: string
+      - description: TwoFactor authentication code
+        in: query
+        name: code
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.TokenResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Verify a user login with a twofa code
+      tags:
+      - User
 securityDefinitions:
   BearerAuth:
     in: header
