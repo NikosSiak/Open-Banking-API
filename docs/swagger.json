@@ -87,21 +87,12 @@
                 "summary": "Register a new User",
                 "parameters": [
                     {
-                        "description": "User email",
-                        "name": "email",
+                        "description": "User info",
+                        "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "User password",
-                        "name": "password",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.User"
                         }
                     }
                 ],
@@ -201,6 +192,25 @@
         }
     },
     "definitions": {
+        "models.User": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "phone_number"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
         "models.UserLoginCredentials": {
             "type": "object",
             "required": [

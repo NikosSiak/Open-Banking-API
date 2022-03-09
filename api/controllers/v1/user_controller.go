@@ -41,10 +41,9 @@ func NewUserController(
 // @Summary  Register a new User
 // @Tags     User
 // @Router   /register [post]
-// @Param    email     body      string  true  "User email"
-// @Param    password  body      string  true  "User password"
-// @Success  200       {object}  responses.TokenResponse
-// @Failure  500       {object}  utils.HTTPError
+// @Param    data  body      models.User  true  "User info"
+// @Success  200   {object}  responses.TokenResponse
+// @Failure  500   {object}  utils.HTTPError
 func (u UserController) CreateUser(ctx *gin.Context) {
 	user := models.User{}
 
@@ -52,6 +51,8 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
+
+	user.HasTwoFa = true
 
 	if err := user.HashPassword(); err != nil {
 		utils.NewError(ctx, http.StatusInternalServerError, err)

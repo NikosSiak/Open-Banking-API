@@ -1,4 +1,17 @@
 definitions:
+  models.User:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    required:
+    - email
+    - password
+    - phone_number
+    type: object
   models.UserLoginCredentials:
     properties:
       email:
@@ -104,18 +117,12 @@ paths:
   /register:
     post:
       parameters:
-      - description: User email
+      - description: User info
         in: body
-        name: email
+        name: data
         required: true
         schema:
-          type: string
-      - description: User password
-        in: body
-        name: password
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/models.User'
       responses:
         "200":
           description: OK
