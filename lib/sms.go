@@ -17,7 +17,6 @@ func NewSMSProvider(env Env) SMSProvider {
 		Credentials: client.NewCredentials(env.TwilioCredentials.AccountSID, env.TwilioCredentials.AuthToken),
 	}
 
-	// defaultClient.SetAccountSid(env.TwilioCredentials.AccountSID)
 	verifyClient := VerifyV2.NewApiServiceWithClient(defaultClient)
 	return SMSProvider{
 		verifySID:    env.TwilioCredentials.VerifySID,
