@@ -110,7 +110,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.TokenResponse"
+                            "$ref": "#/definitions/responses.LoginResponse"
                         }
                     },
                     "500": {

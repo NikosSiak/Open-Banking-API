@@ -42,7 +42,7 @@ func NewUserController(
 // @Tags     User
 // @Router   /register [post]
 // @Param    data  body      models.User  true  "User info"
-// @Success  200   {object}  responses.TokenResponse
+// @Success  200   {object}  responses.LoginResponse
 // @Failure  500   {object}  utils.HTTPError
 func (u UserController) CreateUser(ctx *gin.Context) {
 	user := models.User{}
@@ -66,6 +66,26 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
+	userId := inserted.InsertedID.(primitive.ObjectID).Hex()
+
+	if user.HasTwoFa {
+		sid, err := u.sms.SendVerificationCode(user.PhoneNumber)
+		if err != nil {
+			utils.NewError(ctx, http.StatusInternalServerError, err)
+			return
+		}
+
+		if err = u.redis.Set(ctx.Request.Context(), sid, userId, 0).Err(); err != nil {
+			utils.NewError(ctx, http.StatusInternalServerError, err)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"sid": sid,
+		})
+
+		return
+	}
 
 	td, err := u.authService.CreateTokens()
 	if err != nil {
@@ -73,7 +93,6 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	userId := inserted.InsertedID.(primitive.ObjectID).Hex()
 	if err = u.storeTokenDetails(ctx.Request.Context(), userId, td); err != nil {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
