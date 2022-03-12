@@ -5,7 +5,7 @@ import (
 )
 
 var Module = fx.Options(
-	fx.Provide(GetEnv),
+	fx.Provide(NewEnv),
 	fx.Provide(NewDB),
 	fx.Provide(NewRedis),
 	fx.Provide(NewRequestHandler),

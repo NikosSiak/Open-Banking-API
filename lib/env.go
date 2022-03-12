@@ -38,7 +38,7 @@ type Env struct {
 	TwilioCredentials *TwilioCredentials              `mapstructure:"twilio"`
 }
 
-func GetEnv() Env {
+func NewEnv() Env {
 	env := Env{
 		ServerPort:  "1312",
 		Environment: "development",
