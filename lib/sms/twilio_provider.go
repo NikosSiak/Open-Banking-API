@@ -13,14 +13,14 @@ type twilioProvider struct {
 	verifyClient *VerifyV2.ApiService
 }
 
-func newTwilioProvider(env lib.Env) twilioProvider {
+func newTwilioProvider(credentials *lib.TwilioCredentials) twilioProvider {
 	defaultClient := &client.Client{
-		Credentials: client.NewCredentials(env.TwilioCredentials.AccountSID, env.TwilioCredentials.AuthToken),
+		Credentials: client.NewCredentials(credentials.AccountSID, credentials.AuthToken),
 	}
 
 	verifyClient := VerifyV2.NewApiServiceWithClient(defaultClient)
 	return twilioProvider{
-		verifySID:    env.TwilioCredentials.VerifySID,
+		verifySID:    credentials.VerifySID,
 		verifyClient: verifyClient,
 	}
 }

@@ -9,7 +9,7 @@ type SMSProvider interface {
 
 func NewSMSProvider(env lib.Env) SMSProvider {
 	if env.IsProduction() {
-		return newTwilioProvider(env)
+		return newTwilioProvider(env.TwilioCredentials)
 	}
 
 	return newMockProvider()
