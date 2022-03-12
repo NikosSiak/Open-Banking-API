@@ -57,3 +57,7 @@ func GetEnv() Env {
 
 	return env
 }
+
+func (e Env) IsProduction() bool {
+	return e.Environment == "production"
+}

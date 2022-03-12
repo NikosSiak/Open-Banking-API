@@ -1,35 +1,36 @@
-package lib
+package sms
 
 import (
+	"github.com/NikosSiak/Open-Banking-API/lib"
 	"github.com/twilio/twilio-go/client"
 	VerifyV2 "github.com/twilio/twilio-go/rest/verify/v2"
 )
 
 const channel = "sms"
 
-type SMSProvider struct {
+type twilioProvider struct {
 	verifySID    string
 	verifyClient *VerifyV2.ApiService
 }
 
-func NewSMSProvider(env Env) SMSProvider {
+func newTwilioProvider(env lib.Env) twilioProvider {
 	defaultClient := &client.Client{
 		Credentials: client.NewCredentials(env.TwilioCredentials.AccountSID, env.TwilioCredentials.AuthToken),
 	}
 
 	verifyClient := VerifyV2.NewApiServiceWithClient(defaultClient)
-	return SMSProvider{
+	return twilioProvider{
 		verifySID:    env.TwilioCredentials.VerifySID,
 		verifyClient: verifyClient,
 	}
 }
 
-func (s SMSProvider) SendVerificationCode(to string) (string, error) {
+func (t twilioProvider) SendVerificationCode(to string) (string, error) {
 	params := VerifyV2.CreateVerificationParams{}
 	params.SetChannel(channel)
 	params.SetTo(to)
 
-	verification, err := s.verifyClient.CreateVerification(s.verifySID, &params)
+	verification, err := t.verifyClient.CreateVerification(t.verifySID, &params)
 	if err != nil {
 		return "", err
 	}
@@ -37,12 +38,12 @@ func (s SMSProvider) SendVerificationCode(to string) (string, error) {
 	return *verification.Sid, nil
 }
 
-func (s SMSProvider) VerifyCode(sid string, code string) (bool, error) {
+func (t twilioProvider) VerifyCode(verificationId string, code string) (bool, error) {
 	params := VerifyV2.CreateVerificationCheckParams{}
 	params.SetCode(code)
-	params.SetVerificationSid(sid)
+	params.SetVerificationSid(verificationId)
 
-	res, err := s.verifyClient.CreateVerificationCheck(s.verifySID, &params)
+	res, err := t.verifyClient.CreateVerificationCheck(t.verifySID, &params)
 
 	return *res.Valid, err
 }

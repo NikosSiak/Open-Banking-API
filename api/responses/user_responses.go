@@ -7,7 +7,7 @@ type TokenResponse struct {
 
 type LoginResponse struct {
 	*TokenResponse
-	Sid string `json:"sid"`
+	VerificationId string `json:"verification_id"`
 }
 
 type SuccessResponse struct {

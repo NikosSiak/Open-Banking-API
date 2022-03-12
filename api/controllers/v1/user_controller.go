@@ -9,6 +9,7 @@ import (
 
 	"github.com/NikosSiak/Open-Banking-API/api/utils"
 	"github.com/NikosSiak/Open-Banking-API/lib"
+	"github.com/NikosSiak/Open-Banking-API/lib/sms"
 	"github.com/NikosSiak/Open-Banking-API/models"
 	"github.com/NikosSiak/Open-Banking-API/services"
 	"github.com/gin-gonic/gin"
@@ -20,14 +21,14 @@ type UserController struct {
 	db          lib.Database
 	redis       lib.Redis
 	authService services.AuthService
-	sms         lib.SMSProvider
+	sms         sms.SMSProvider
 }
 
 func NewUserController(
 	db lib.Database,
 	redis lib.Redis,
 	authService services.AuthService,
-	sms lib.SMSProvider,
+	sms sms.SMSProvider,
 ) UserController {
 	return UserController{
 		db:          db,
@@ -69,19 +70,19 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 	userId := inserted.InsertedID.(primitive.ObjectID).Hex()
 
 	if user.HasTwoFa {
-		sid, err := u.sms.SendVerificationCode(user.PhoneNumber)
+		verificationId, err := u.sms.SendVerificationCode(user.PhoneNumber)
 		if err != nil {
 			utils.NewError(ctx, http.StatusInternalServerError, err)
 			return
 		}
 
-		if err = u.redis.Set(ctx.Request.Context(), sid, userId, 0).Err(); err != nil {
+		if err = u.redis.Set(ctx.Request.Context(), verificationId, userId, 0).Err(); err != nil {
 			utils.NewError(ctx, http.StatusInternalServerError, err)
 			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
-			"sid": sid,
+			"verification_id": verificationId,
 		})
 
 		return
@@ -140,19 +141,19 @@ func (u UserController) AuthenticateUser(ctx *gin.Context) {
 	}
 
 	if user.HasTwoFa {
-		sid, err := u.sms.SendVerificationCode(user.PhoneNumber)
+		verificationId, err := u.sms.SendVerificationCode(user.PhoneNumber)
 		if err != nil {
 			utils.NewError(ctx, http.StatusInternalServerError, err)
 			return
 		}
 
-		if err = u.redis.Set(ctx.Request.Context(), sid, user.ID.Hex(), 0).Err(); err != nil {
+		if err = u.redis.Set(ctx.Request.Context(), verificationId, user.ID.Hex(), 0).Err(); err != nil {
 			utils.NewError(ctx, http.StatusInternalServerError, err)
 			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
-			"sid": sid,
+			"verification_id": verificationId,
 		})
 
 		return
@@ -180,16 +181,16 @@ func (u UserController) AuthenticateUser(ctx *gin.Context) {
 // @Summary  Verify a user login with a twofa code
 // @Tags     User
 // @Router   /verify [post]
-// @Param    sid   query     string  true  "Verification ID provided by login"
-// @Param    code  query     string  true  "TwoFactor authentication code"
-// @Success  200   {object}  responses.TokenResponse
-// @Failure  401   {object}  utils.HTTPError
-// @Failure  500   {object}  utils.HTTPError
+// @Param    verification_id  query     string  true  "Verification ID provided by login"
+// @Param    code             query     string  true  "TwoFactor authentication code"
+// @Success  200              {object}  responses.TokenResponse
+// @Failure  401              {object}  utils.HTTPError
+// @Failure  500              {object}  utils.HTTPError
 func (u UserController) ValidateCode(ctx *gin.Context) {
-	sid := ctx.Query("sid")
+	verificationId := ctx.Query("verification_id")
 	code := ctx.Query("code")
 
-	valid, err := u.sms.VerifyCode(sid, code)
+	valid, err := u.sms.VerifyCode(verificationId, code)
 	if err != nil {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
@@ -206,7 +207,7 @@ func (u UserController) ValidateCode(ctx *gin.Context) {
 		return
 	}
 
-	userId, err := u.redis.Get(ctx.Request.Context(), sid).Result()
+	userId, err := u.redis.Get(ctx.Request.Context(), verificationId).Result()
 	if err != nil {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
@@ -217,7 +218,7 @@ func (u UserController) ValidateCode(ctx *gin.Context) {
 		return
 	}
 
-	u.redis.Del(ctx.Request.Context(), sid)
+	u.redis.Del(ctx.Request.Context(), verificationId)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"access_token":  td.AccessToken,

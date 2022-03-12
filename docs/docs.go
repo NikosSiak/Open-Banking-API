@@ -166,7 +166,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Verification ID provided by login",
-                        "name": "sid",
+                        "name": "verification_id",
                         "in": "query",
                         "required": true
                     },
@@ -254,7 +254,7 @@ const docTemplate = `{
                 "refresh_token": {
                     "type": "string"
                 },
-                "sid": {
+                "verification_id": {
                     "type": "string"
                 }
             }

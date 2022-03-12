@@ -34,7 +34,7 @@ definitions:
         type: string
       refresh_token:
         type: string
-      sid:
+      verification_id:
         type: string
     type: object
   responses.SuccessResponse:
@@ -161,7 +161,7 @@ paths:
       parameters:
       - description: Verification ID provided by login
         in: query
-        name: sid
+        name: verification_id
         required: true
         type: string
       - description: TwoFactor authentication code
