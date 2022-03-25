@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -121,6 +122,8 @@ func (u UserController) AuthenticateUser(ctx *gin.Context) {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
+
+	fmt.Println("perasa")
 
 	user := models.User{}
 

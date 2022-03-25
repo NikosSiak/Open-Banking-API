@@ -14,9 +14,9 @@ type Account struct {
 
 type User struct {
 	ID          primitive.ObjectID  `bson:"_id,omitempty" json:"-"`
-	Email       string              `bson:"email,omitempty" json:"email,omitempty" binding:"required"`
-	Password    string              `bson:"hashed_password,omitempty" json:"password,omitempty" binding:"required"`
-	PhoneNumber string              `bson:"phone_number,omitempty" json:"phone_number,omitempty" binding:"required"`
+	Email       string              `bson:"email,omitempty" json:"email,omitempty" validate:"required,email"`
+	Password    string              `bson:"hashed_password,omitempty" json:"password,omitempty" validate:"required"`
+	PhoneNumber string              `bson:"phone_number,omitempty" json:"phone_number,omitempty" validate:"required"`
 	HasTwoFa    bool                `bson:"has_two_fa,omitempty" json:"-"`
 	Accounts    map[string]*Account `bson:"accounts,omitempty" json:"-"`
 	CreatedAt   primitive.DateTime  `bson:"created_at" json:"-"`
@@ -24,7 +24,7 @@ type User struct {
 }
 
 type UserLoginCredentials struct {
-	Email    string `json:"email" validate:"required"`
+	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
 
