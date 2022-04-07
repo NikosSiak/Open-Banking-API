@@ -197,7 +197,7 @@ func (u UserController) ValidateCode(ctx *gin.Context) {
 	}
 
 	if !valid {
-		utils.NewError(ctx, http.StatusUnauthorized, errors.New("Invalid code"))
+		utils.NewError(ctx, http.StatusUnauthorized, errors.New("invalid code"))
 		return
 	}
 
