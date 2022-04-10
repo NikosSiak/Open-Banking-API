@@ -51,9 +51,7 @@ func (a AlphaController) AuthorizationCodeHook(ctx *gin.Context) {
 	code := ctx.Query("code")
 	userId, err := primitive.ObjectIDFromHex(ctx.Query("state"))
 	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": err,
-		})
+		utils.NewError(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -61,25 +59,23 @@ func (a AlphaController) AuthorizationCodeHook(ctx *gin.Context) {
 
 	err = a.db.FindOne(ctx.Request.Context(), &user, bson.M{"_id": userId}, bson.M{})
 	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": err,
-		})
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
 	accessToken, err := a.provider.GetUserAccessToken(code)
 	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": err,
-		})
+		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
 	user.AddAccount(a.provider.Name(), &models.Account{AccessToken: accessToken})
 
 	err = a.db.UpdateByID(ctx.Request.Context(), user.ID, &user)
+	if err != nil {
+		utils.NewError(ctx, http.StatusInternalServerError, err)
+		return
+	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": err,
-	})
+	ctx.JSON(http.StatusOK, gin.H{})
 }
