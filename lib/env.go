@@ -8,6 +8,7 @@ import (
 
 type ProviderCredentials struct {
 	BaseUrl         string `mapstructure:"base_url"`
+	BaseAuthUrl     string `mapstructure:"base_auth_url"`
 	BaseApiUrl      string `mapstructure:"base_api_url"`
 	ClientId        string `mapstructure:"client_id"`
 	ClientSecret    string `mapstructure:"client_secret"`
