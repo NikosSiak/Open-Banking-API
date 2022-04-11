@@ -8,8 +8,6 @@ import (
 	"github.com/NikosSiak/Open-Banking-API/models"
 	"github.com/NikosSiak/Open-Banking-API/services/providers"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AlphaController struct {
@@ -17,9 +15,9 @@ type AlphaController struct {
 	db       lib.Database
 }
 
-func NewAlphaController(provider providers.Alpha, db lib.Database) AlphaController {
+func NewAlphaController(env lib.Env, db lib.Database) AlphaController {
 	return AlphaController{
-		provider: provider,
+		provider: providers.NewAlphaProvider(env.AppUrl, *env.Providers[providers.AlphaName]),
 		db:       db,
 	}
 }
@@ -49,29 +47,9 @@ func (a AlphaController) AddAccount(ctx *gin.Context) {
 
 func (a AlphaController) AuthorizationCodeHook(ctx *gin.Context) {
 	code := ctx.Query("code")
-	userId, err := primitive.ObjectIDFromHex(ctx.Query("state"))
-	if err != nil {
-		utils.NewError(ctx, http.StatusBadRequest, err)
-		return
-	}
+	userId := ctx.Query("state")
 
-	user := models.User{}
-
-	err = a.db.FindOne(ctx.Request.Context(), &user, bson.M{"_id": userId}, bson.M{})
-	if err != nil {
-		utils.NewError(ctx, http.StatusInternalServerError, err)
-		return
-	}
-
-	accessToken, err := a.provider.GetUserAccessToken(code)
-	if err != nil {
-		utils.NewError(ctx, http.StatusInternalServerError, err)
-		return
-	}
-
-	user.AddAccount(a.provider.Name(), &models.Account{AccessToken: accessToken})
-
-	err = a.db.UpdateByID(ctx.Request.Context(), user.ID, &user)
+	err := providers.AddAccountToUser(ctx.Request.Context(), a.db, a.provider, code, userId)
 	if err != nil {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
 		return

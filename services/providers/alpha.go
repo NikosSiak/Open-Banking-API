@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/NikosSiak/Open-Banking-API/lib"
+	"github.com/NikosSiak/Open-Banking-API/models"
 )
 
 type Alpha struct {
@@ -18,12 +19,11 @@ type Alpha struct {
 	clientId, clientSecret, subscriptionKey string
 }
 
-const alphaName = "alpha"
+const AlphaName = "alpha"
 
-func NewAlphaProvider(env lib.Env) Alpha {
-	provider := env.Providers[alphaName]
+func NewAlphaProvider(appUrl string, provider lib.ProviderCredentials) Alpha {
 	return Alpha{
-		appUrl:          env.AppUrl,
+		appUrl:          appUrl,
 		baseUrl:         provider.BaseUrl,
 		baseAPIUrl:      provider.BaseApiUrl,
 		clientId:        provider.ClientId,
@@ -33,7 +33,7 @@ func NewAlphaProvider(env lib.Env) Alpha {
 }
 
 func (a Alpha) Name() string {
-	return alphaName
+	return AlphaName
 }
 
 func (a Alpha) LoginUri(userID string) (string, error) {
@@ -60,7 +60,9 @@ func (a Alpha) LoginUri(userID string) (string, error) {
 	return loginUri, nil
 }
 
-func (a Alpha) GetUserAccessToken(code string) (string, error) {
+func (a Alpha) GetUserTokens(code string) (models.Account, error) {
+	account := models.Account{}
+
 	url := a.baseUrl + "/auth/token"
 	method := "POST"
 
@@ -77,20 +79,20 @@ func (a Alpha) GetUserAccessToken(code string) (string, error) {
 	req, err := http.NewRequest(method, url, payload)
 
 	if err != nil {
-		return "", err
+		return account, err
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencode")
 
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return account, err
 	}
 	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return "", err
+		return account, err
 	}
 
 	type response struct {
@@ -104,7 +106,9 @@ func (a Alpha) GetUserAccessToken(code string) (string, error) {
 		err = errors.New(resp.Error)
 	}
 
-	return resp.AccessToken, err
+	account.AccessToken = resp.AccessToken
+
+	return account, err
 }
 
 func (a Alpha) getClientAccessToken() (string, error) {
