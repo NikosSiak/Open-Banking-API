@@ -17,6 +17,8 @@ func NewSwaggerRoutes(handler lib.RequestHandler, env lib.Env) SwaggerRoutes {
 }
 
 func (s SwaggerRoutes) Setup() {
-	docs.SwaggerInfo.Host = s.env.AppUrl
-	s.handler.Gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	if !s.env.IsProduction() {
+		docs.SwaggerInfo.Host = s.env.AppUrl
+		s.handler.Gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	}
 }
