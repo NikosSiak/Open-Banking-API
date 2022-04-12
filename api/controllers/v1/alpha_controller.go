@@ -24,7 +24,7 @@ func NewAlphaController(env lib.Env, db lib.Database) AlphaController {
 
 // Add AlphaBank Account
 // @Summary      Authorize the use of the user's AlphaBank account
-// @Description  Use the URI to open AlphaBank's login page
+// @Description  Use the URI to open AlphaBank's login page<br>You can find login credentials <a href="https://developer.api.alphabank.eu/getting-started/">here</a>
 // @Tags         Accounts
 // @Router       /v1/accounts/alpha [post]
 // @Security     BearerAuth

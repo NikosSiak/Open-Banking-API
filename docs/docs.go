@@ -129,7 +129,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Use the URI to open AlphaBank's login page",
+                "description": "Use the URI to open AlphaBank's login page\u003cbr\u003eYou can find login credentials \u003ca href=\"https://developer.api.alphabank.eu/getting-started/\"\u003ehere\u003c/a\u003e",
                 "tags": [
                     "Accounts"
                 ],
@@ -163,7 +163,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Use the URI to open Eurobank's login page",
+                "description": "Use the URI to open Eurobank's login page\u003cbr\u003eYou can find login credentials \u003ca href=\"https://developer.eurobank.gr/eurobank/apis/support\"\u003ehere\u003c/a\u003e under \"Which users can be used to log-in to sandbox environment?\"",
                 "tags": [
                     "Accounts"
                 ],

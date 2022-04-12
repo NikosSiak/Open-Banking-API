@@ -24,7 +24,7 @@ func NewEurobankController(env lib.Env, db lib.Database) EurobankController {
 
 // Add Eurobank Account
 // @Summary      Authorize the use of the user's Eurobank account
-// @Description  Use the URI to open Eurobank's login page
+// @Description  Use the URI to open Eurobank's login page<br>You can find login credentials <a href="https://developer.eurobank.gr/eurobank/apis/support">here</a> under "Which users can be used to log-in to sandbox environment?"
 // @Tags         Accounts
 // @Router       /v1/accounts/eurobank [post]
 // @Security     BearerAuth

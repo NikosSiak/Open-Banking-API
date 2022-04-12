@@ -136,7 +136,8 @@ paths:
       - User
   /v1/accounts/alpha:
     post:
-      description: Use the URI to open AlphaBank's login page
+      description: Use the URI to open AlphaBank's login page<br>You can find login
+        credentials <a href="https://developer.api.alphabank.eu/getting-started/">here</a>
       responses:
         "200":
           description: OK
@@ -157,7 +158,9 @@ paths:
       - Accounts
   /v1/accounts/eurobank:
     post:
-      description: Use the URI to open Eurobank's login page
+      description: Use the URI to open Eurobank's login page<br>You can find login
+        credentials <a href="https://developer.eurobank.gr/eurobank/apis/support">here</a>
+        under "Which users can be used to log-in to sandbox environment?"
       responses:
         "200":
           description: OK
