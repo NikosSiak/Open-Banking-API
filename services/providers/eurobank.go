@@ -78,8 +78,8 @@ func (e Eurobank) GetUserTokens(code string) (models.Account, error) {
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
-			Renegotiation:      tls.RenegotiationSupport(tls.RequestClientCert),
-			InsecureSkipVerify: true},
+			Renegotiation: tls.RenegotiationSupport(tls.RequestClientCert),
+		},
 	}
 
 	client := &http.Client{Transport: tr}
