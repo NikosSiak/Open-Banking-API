@@ -138,7 +138,41 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.AddAlphaBankAccountResponse"
+                            "$ref": "#/definitions/responses.AddBankAccountResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UnauthorizedError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/accounts/eurobank": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Use the URI to open Eurobank's login page",
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Authorize the use of the user's Eurobank account",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AddBankAccountResponse"
                         }
                     },
                     "401": {
@@ -236,12 +270,11 @@ const docTemplate = `{
                 }
             }
         },
-        "responses.AddAlphaBankAccountResponse": {
+        "responses.AddBankAccountResponse": {
             "type": "object",
             "properties": {
                 "uri": {
-                    "type": "string",
-                    "example": "https://gw.api.alphabank.eu/sandbox/auth/authorize"
+                    "type": "string"
                 }
             }
         },

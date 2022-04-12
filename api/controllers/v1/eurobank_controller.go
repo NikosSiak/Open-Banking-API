@@ -22,6 +22,15 @@ func NewEurobankController(env lib.Env, db lib.Database) EurobankController {
 	}
 }
 
+// Add Eurobank Account
+// @Summary      Authorize the use of the user's Eurobank account
+// @Description  Use the URI to open Eurobank's login page
+// @Tags         Accounts
+// @Router       /v1/accounts/eurobank [post]
+// @Security     BearerAuth
+// @Success      200  {object}  responses.AddBankAccountResponse
+// @Failure      401  {object}  responses.UnauthorizedError
+// @Failure      500  {object}  utils.HTTPError
 func (e EurobankController) AddAccount(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
 

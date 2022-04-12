@@ -28,7 +28,7 @@ func NewAlphaController(env lib.Env, db lib.Database) AlphaController {
 // @Tags         Accounts
 // @Router       /v1/accounts/alpha [post]
 // @Security     BearerAuth
-// @Success      200  {object}  responses.AddAlphaBankAccountResponse
+// @Success      200  {object}  responses.AddBankAccountResponse
 // @Failure      401  {object}  responses.UnauthorizedError
 // @Failure      500  {object}  utils.HTTPError
 func (a AlphaController) AddAccount(ctx *gin.Context) {
