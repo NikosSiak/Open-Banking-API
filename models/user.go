@@ -14,7 +14,7 @@ type Account struct {
 
 type User struct {
 	ID          primitive.ObjectID  `bson:"_id,omitempty" json:"-"`
-	Email       string              `bson:"email,omitempty" json:"email,omitempty" binding:"required"`
+	Email       string              `bson:"email,omitempty" json:"email,omitempty" binding:"required" validate:"email"`
 	Password    string              `bson:"hashed_password,omitempty" json:"password,omitempty" binding:"required"`
 	PhoneNumber string              `bson:"phone_number,omitempty" json:"phone_number,omitempty" binding:"required"`
 	HasTwoFa    bool                `bson:"has_two_fa,omitempty" json:"-"`
@@ -24,7 +24,7 @@ type User struct {
 }
 
 type UserLoginCredentials struct {
-	Email    string `json:"email" validate:"required"`
+	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
 

@@ -13,6 +13,7 @@ import (
 	"github.com/NikosSiak/Open-Banking-API/models"
 	"github.com/NikosSiak/Open-Banking-API/services"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -50,6 +51,11 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err := validator.New().Struct(user); err != nil {
+		utils.NewError(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -119,6 +125,11 @@ func (u UserController) AuthenticateUser(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&userCreds); err != nil {
 		utils.NewError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err := validator.New().Struct(userCreds); err != nil {
+		utils.NewError(ctx, http.StatusBadRequest, err)
 		return
 	}
 
