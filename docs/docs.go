@@ -89,6 +89,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/refresh": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get a new access and refresh tokens",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Refresh token provided by login",
+                        "name": "refresh_token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.TokenResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/register": {
             "post": {
                 "tags": [

@@ -113,6 +113,26 @@ paths:
       summary: Invalidate User tokens
       tags:
       - User
+  /refresh:
+    post:
+      parameters:
+      - description: Refresh token provided by login
+        in: query
+        name: refresh_token
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.TokenResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get a new access and refresh tokens
+      tags:
+      - User
   /register:
     post:
       parameters:

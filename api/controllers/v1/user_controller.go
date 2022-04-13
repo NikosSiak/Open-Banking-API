@@ -249,6 +249,41 @@ func (u UserController) LogoutUser(ctx *gin.Context) {
 	})
 }
 
+// Refresh Tokens
+// @Summary  Get a new access and refresh tokens
+// @Tags     User
+// @Router   /refresh [post]
+// @Param    refresh_token  query     string  true  "Refresh token provided by login"
+// @Success  200            {object}  responses.TokenResponse
+// @Failure  500            {object}  utils.HTTPError
+func (u UserController) RefreshTokens(ctx *gin.Context) {
+	refreshToken := ctx.Query("refresh_token")
+
+	userId, err := u.redis.Get(ctx, refreshToken).Result()
+	if err != nil {
+		utils.NewError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	td, err := u.authService.CreateTokens()
+	if err != nil {
+		utils.NewError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	u.deleteToken(ctx.Request.Context(), refreshToken)
+
+	if err = u.storeTokenDetails(ctx.Request.Context(), userId, td); err != nil {
+		utils.NewError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"access_token":  td.AccessToken,
+		"refresh_token": td.RefreshToken,
+	})
+}
+
 func (u UserController) storeTokenDetails(c context.Context, userId string, td *services.TokenDetails) error {
 	at := time.Unix(td.AtExpires, 0)
 	rt := time.Unix(td.RtExpires, 0)
