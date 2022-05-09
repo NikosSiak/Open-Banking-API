@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"net/url"
+
 	"github.com/NikosSiak/Open-Banking-API/docs"
 	"github.com/NikosSiak/Open-Banking-API/lib"
 	swaggerfiles "github.com/swaggo/files"
@@ -18,7 +20,13 @@ func NewSwaggerRoutes(handler lib.RequestHandler, env lib.Env) SwaggerRoutes {
 
 func (s SwaggerRoutes) Setup() {
 	if !s.env.IsProduction() {
-		docs.SwaggerInfo.Host = s.env.AppUrl
+		url, err := url.Parse(s.env.AppUrl)
+		if err != nil {
+			return
+		}
+
+		docs.SwaggerInfo.Host = url.Host
+		docs.SwaggerInfo.Schemes = []string{url.Scheme}
 		s.handler.Gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	}
 }
