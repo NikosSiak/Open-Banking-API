@@ -37,6 +37,7 @@ type Env struct {
 	Environment       string                          `mapstructure:"environment"`
 	Providers         map[string]*ProviderCredentials `mapstructure:"providers"`
 	TwilioCredentials *TwilioCredentials              `mapstructure:"twilio"`
+	SentryDsn         string                          `mapstructure:"sentry_dsn"`
 }
 
 func NewEnv() Env {
