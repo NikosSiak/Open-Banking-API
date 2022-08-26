@@ -85,7 +85,7 @@ func (a AuthService) GetAccessUuid(tokenString string) (string, error) {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return "", errors.New("invlaid token")
+		return "", errors.New("invalid token")
 	}
 
 	accessUuid, ok := claims["access_uuid"].(string)
