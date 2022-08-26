@@ -7,23 +7,26 @@ import (
 )
 
 type AccountRoutes struct {
-	handler            lib.RequestHandler
-	alphaController    controllers.AlphaController
-	eurobankController controllers.EurobankController
-	jwtAuthMiddleware  middlewares.JwtAuthMiddleware
+	handler               lib.RequestHandler
+	alphaController       controllers.AlphaController
+	eurobankController    controllers.EurobankController
+	piraeusbankController controllers.PiraeusbankController
+	jwtAuthMiddleware     middlewares.JwtAuthMiddleware
 }
 
 func NewAccountRoutes(
 	handler lib.RequestHandler,
 	alphaController controllers.AlphaController,
 	eurobankController controllers.EurobankController,
+	piraeusbankController controllers.PiraeusbankController,
 	jwtAuthMiddleware middlewares.JwtAuthMiddleware,
 ) AccountRoutes {
 	return AccountRoutes{
-		handler:            handler,
-		alphaController:    alphaController,
-		eurobankController: eurobankController,
-		jwtAuthMiddleware:  jwtAuthMiddleware,
+		handler:               handler,
+		alphaController:       alphaController,
+		eurobankController:    eurobankController,
+		piraeusbankController: piraeusbankController,
+		jwtAuthMiddleware:     jwtAuthMiddleware,
 	}
 }
 
@@ -35,5 +38,8 @@ func (a AccountRoutes) Setup() {
 
 		accountsGroup.POST("/eurobank", a.jwtAuthMiddleware.Handle, a.eurobankController.AddAccount)
 		accountsGroup.GET("/eurobank/webhook", a.eurobankController.AuthorizationCodeHook)
+
+		accountsGroup.POST("/piraeusbank", a.jwtAuthMiddleware.Handle, a.piraeusbankController.AddAccount)
+		accountsGroup.GET("/piraeusbank/webhook", a.piraeusbankController.AuthorizationCodeHook)
 	}
 }

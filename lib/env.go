@@ -13,6 +13,7 @@ type ProviderCredentials struct {
 	ClientId        string `mapstructure:"client_id"`
 	ClientSecret    string `mapstructure:"client_secret"`
 	SubscriptionKey string `mapstructure:"subscription_key"`
+	Scope           string `mapstructure:"scope"`
 }
 
 type RedisCredentials struct {

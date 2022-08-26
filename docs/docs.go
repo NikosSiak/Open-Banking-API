@@ -221,6 +221,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/accounts/piraeusbank": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Use the URI to open Piraeusbank's login page\u003cbr\u003eYou can find login credentials \u003ca href=\"https://rapidlink.piraeusbank.gr/node/2059\"\u003ehere\u003c/a\u003e",
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Authorize the use of the user's Piraeusbank account",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AddBankAccountResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UnauthorizedError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/verify": {
             "post": {
                 "tags": [
