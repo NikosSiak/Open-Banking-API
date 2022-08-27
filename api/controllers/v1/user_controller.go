@@ -66,7 +66,7 @@ func (u UserController) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	user.Accounts = map[string]*models.Account{}
+	user.Accounts = map[string]*models.AccountTokens{}
 
 	inserted, err := u.db.InsertOne(ctx.Request.Context(), &user)
 	if err != nil {

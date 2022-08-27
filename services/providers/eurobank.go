@@ -50,8 +50,8 @@ func (e Eurobank) LoginUri(userID string) string {
 	return loginUri
 }
 
-func (e Eurobank) GetUserTokens(code string) (models.Account, error) {
-	account := models.Account{}
+func (e Eurobank) GetUserTokens(code string) (models.AccountTokens, error) {
+	account := models.AccountTokens{}
 
 	url := e.baseAuthUrl + "/token"
 	method := "POST"

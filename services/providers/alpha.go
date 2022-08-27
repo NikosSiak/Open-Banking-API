@@ -60,8 +60,8 @@ func (a Alpha) LoginUri(userID string) (string, error) {
 	return loginUri, nil
 }
 
-func (a Alpha) GetUserTokens(code string) (models.Account, error) {
-	account := models.Account{}
+func (a Alpha) GetUserTokens(code string) (models.AccountTokens, error) {
+	account := models.AccountTokens{}
 
 	url := a.baseUrl + "/auth/token"
 	method := "POST"

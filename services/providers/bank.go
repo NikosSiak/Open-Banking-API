@@ -4,5 +4,5 @@ import "github.com/NikosSiak/Open-Banking-API/models"
 
 type Bank interface {
 	Name() string
-	GetUserTokens(code string) (models.Account, error)
+	GetUserTokens(code string) (models.AccountTokens, error)
 }

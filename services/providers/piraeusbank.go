@@ -52,8 +52,8 @@ func (p Piraeusbank) LoginUri(userID string) string {
 	return loginUri
 }
 
-func (p Piraeusbank) GetUserTokens(code string) (models.Account, error) {
-	account := models.Account{}
+func (p Piraeusbank) GetUserTokens(code string) (models.AccountTokens, error) {
+	account := models.AccountTokens{}
 
 	url := p.baseAuthUrl + "/token"
 	method := "POST"

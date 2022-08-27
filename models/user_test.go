@@ -73,7 +73,7 @@ type AddAccountSuite struct {
 	suite.Suite
 	user        models.User
 	accountName string
-	account     models.Account
+	account     models.AccountTokens
 }
 
 func (suite *AddAccountSuite) SetupTest() {
@@ -81,7 +81,7 @@ func (suite *AddAccountSuite) SetupTest() {
 
 	suite.user = user
 	suite.accountName = "testAccount"
-	suite.account = models.Account{AccessToken: "access_token", RefreshToken: "refresh_token"}
+	suite.account = models.AccountTokens{AccessToken: "access_token", RefreshToken: "refresh_token"}
 }
 
 func (suite *AddAccountSuite) TestAddNewAccount() {
@@ -90,10 +90,10 @@ func (suite *AddAccountSuite) TestAddNewAccount() {
 }
 
 func (suite *AddAccountSuite) TestAddMoreAccounts() {
-	suite.user.Accounts = map[string]*models.Account{suite.accountName: &suite.account}
+	suite.user.Accounts = map[string]*models.AccountTokens{suite.accountName: &suite.account}
 
 	secondAccountName := "testAccount2"
-	secondAccount := models.Account{}
+	secondAccount := models.AccountTokens{}
 
 	suite.user.AddAccount(secondAccountName, &secondAccount)
 
