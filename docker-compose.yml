@@ -6,6 +6,10 @@ services:
     restart: always
     ports:
       - '1312:1312'
+    environment:
+      VIRTUAL_HOST: ${DOMAIN_NAME}
+      VIRTUAL_PORT: 1312
+      LETSENCRYPT_HOST: ${DOMAIN_NAME}
   redis:
     image: redis:6.2
     restart: always
@@ -21,3 +25,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
